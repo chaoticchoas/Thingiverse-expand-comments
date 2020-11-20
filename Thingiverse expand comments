@@ -10,7 +10,7 @@
 // @run-at       document-idle
 // ==/UserScript==
 // Checks if page is loading then executes function
-var logText = true
+var logText = false
 function debug(text){
     if (logText == true){
         console.log(text)
