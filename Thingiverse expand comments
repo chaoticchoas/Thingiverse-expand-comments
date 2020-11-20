@@ -1,0 +1,57 @@
+// ==UserScript==
+// @name         Thingiverse expand comments
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @require      https://raw.githubusercontent.com/uzairfarooq/arrive/master/minified/arrive.min.js
+// @description  Expands all comments. May take a while on pages with huge ammounts of comments.
+// @author       Tisx
+// @match        https://www.thingiverse.com/thing:*
+// @grant        none
+// @run-at       document-idle
+// ==/UserScript==
+// Checks if page is loading then executes function
+var logText = true
+function debug(text){
+    if (logText == true){
+        console.log(text)
+    }
+}
+//Checks if page is loading
+function chkLoad(callback){
+    var checkExist = setInterval(function(){
+    var spinner = document.getElementsByClassName('Spinner__spinnerWrapper--3TRqa')
+    debug("loading")
+        if (spinner.length == 0) {
+            debug("exited");
+            clearInterval(checkExist)
+            callback()
+        }
+    })
+}
+function loadMore(){
+//Finds and press the View More if any exist and calls chkLoad function otherwise calls View Replies
+    debug("Load More")
+    var buttons = document.getElementsByClassName('Button__button--2kecZ Button__blue--1HC2y ThingCommentsList__viewMore--1JBES');
+    if (buttons.length>0){
+        buttons[0].click();
+        chkLoad(loadMore)
+    }else{
+        viewReplies();
+    };
+}
+function viewReplies(){
+//Finds all View Replies and press them (Currently not working with child comments if their parents comment was deleted)
+    var replies = document.getElementsByClassName('LinkButton__linkButton--U_cBr ThingComment__viewReplies--ODSdi');
+    while(replies.length>0){
+        replies[0].click();
+        debug("View Replies")
+    }
+    var deleted = document.getElementsByClassName('LinkButton__linkButton--U_cBr ThingComment__viewRepliesDeleted--2rmqd');
+    while(deleted.length>0){
+        deleted[0].click();
+        debug("View Deleted")
+    }
+}
+document.arrive(".ThingComment__commentWrapper--269HT", {onceOnly: true}, function() {
+    chkLoad(loadMore)
+});
