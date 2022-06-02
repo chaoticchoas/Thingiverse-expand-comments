@@ -5,7 +5,7 @@
 // @require      https://raw.githubusercontent.com/uzairfarooq/arrive/master/minified/arrive.min.js
 // @description  Expands all comments. May take a while on pages with huge ammounts of comments.
 // @author       Tisx
-// @match        https://www.thingiverse.com/thing:*
+// @match        https://www.thingiverse.com/thing:*/comments
 // @grant        none
 // @run-at       document-idle
 // ==/UserScript==
