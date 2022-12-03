@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Thingiverse expand comments
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.2
 // @require      https://raw.githubusercontent.com/uzairfarooq/arrive/master/minified/arrive.min.js
 // @description  Expands all comments. May take a while on pages with huge ammounts of comments.
 // @author       Tisx
@@ -9,48 +9,46 @@
 // @grant        none
 // @run-at       document-idle
 // ==/UserScript==
-var logText = false
+
+// Set to true to enable debug logging
+const logText = false
+
+
+// Debug function that logs text to the console if debug logging is enabled
 function debug(text){
     if (logText == true){
-        console.log(text)
+        console.log('${text}')
     }
 }
-//Checks if page is loading
-function chkLoad(callback){
-    var checkExist = setInterval(function(){
-    var spinner = document.getElementsByClassName('Spinner__spinnerWrapper--3TRqa')
-    debug("loading")
-        if (spinner.length == 0) {
-            debug("exited");
-            clearInterval(checkExist)
-            callback()
-        }
-    })
-}
-function loadMore(){
-//Finds and press the View More if any exist and calls chkLoad function otherwise calls View Replies
-    debug("Load More")
-    var buttons = document.getElementsByClassName('Button__button--2kecZ Button__blue--1HC2y ThingCommentsList__viewMore--1JBES');
+
+// Expands all comments on the page
+function expandComments(){
+    const buttons = document.getElementsByClassName('Button__button--2kecZ Button__blue--1HC2y ThingCommentsList__viewMore--1JBES');
     if (buttons.length>0){
+        debug("View More")
         buttons[0].click();
-        chkLoad(loadMore)
-    }else{
-        viewReplies();
+        expandComments();
     };
+    debug("View More Done")
+
+    // Find all elements with the specified class
+    const linkButtons = document.querySelectorAll('.LinkButton__linkButton--U_cBr');
+
+    // Loop through the elements
+    linkButtons.forEach(button => {
+        if (button.innerText == "View Replies"){
+            button.click();
+        }
+    });
 }
-function viewReplies(){
-//Finds all View Replies and press them (Currently not working with child comments if their parents comment was deleted)
-    var replies = document.getElementsByClassName('LinkButton__linkButton--U_cBr ThingComment__viewReplies--ODSdi');
-    while(replies.length>0){
-        replies[0].click();
-        debug("View Replies")
-    }
-    var deleted = document.getElementsByClassName('LinkButton__linkButton--U_cBr ThingComment__viewRepliesDeleted--2rmqd');
-    while(deleted.length>0){
-        deleted[0].click();
-        debug("View Deleted")
-    }
-}
-document.arrive(".ThingComment__commentWrapper--269HT", {onceOnly: true}, function() {
-    chkLoad(loadMore)
+
+document.arrive(".ThingComment__commentWrapper--269HT", function() {
+
+  const buttons = document.getElementsByClassName("Button__button--2kecZ Button__blue--1HC2y ThingCommentsList__viewMore--1JBES");
+  const linkButtons = document.querySelectorAll(".LinkButton__linkButton--U_cBr");
+
+  // Check if there are any "View More" or "View Replies" elements on the page
+  if (buttons.length > 0 || linkButtons.length > 0) {
+    expandComments();
+  }
 });
