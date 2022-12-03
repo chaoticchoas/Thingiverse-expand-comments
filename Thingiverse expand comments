@@ -17,7 +17,7 @@ const logText = false
 // Debug function that logs text to the console if debug logging is enabled
 function debug(text){
     if (logText == true){
-        console.log('${text}')
+        console.log(text)
     }
 }
 
